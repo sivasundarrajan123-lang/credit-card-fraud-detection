@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Fraud Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="text-center">🚀 Credit Card Fraud Detection</h2>
+        <p class="text-center">Enter transaction details to check for fraud.</p>
+        <div class="card p-4">
+            <form id="fraudForm">
+                <div id="inputFields"></div>
+                <button type="button" class="btn btn-primary w-100 mt-3" onclick="predictFraud()">🚀 Predict</button>
+                <button type="button" class="btn btn-secondary w-100 mt-2" onclick="fillSampleData()">🎲 Fill Sample Data</button>
+            </form>
+            <div id="result" class="mt-4 text-center fw-bold"></div>
+        </div>
+    </div>
+
+    <script>
+        const features = ["feature1", "feature2", "feature3"]; // Replace with actual feature names
+        const inputFields = document.getElementById("inputFields");
+
+        features.forEach(feature => {
+            inputFields.innerHTML += `<div class="mb-2">
+                <label class="form-label">${feature}</label>
+                <input type="number" step="0.01" class="form-control" id="${feature}" value="0">
+            </div>`;
+        });
+
+        function predictFraud() {
+            const formData = {};
+            features.forEach(feature => {
+                formData[feature] = parseFloat(document.getElementById(feature).value) || 0;
+            });
+
+            fetch("http://localhost:8502/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = data.fraud ? "🚨 Fraud Detected!" : "✅ Transaction is Legitimate.";
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function fillSampleData() {
+            // Fetch sample data from the backend (You should modify this in Streamlit API)
+            fetch("http://localhost:8502/sample")
+            .then(response => response.json())
+            .then(data => {
+                features.forEach((feature, index) => {
+                    document.getElementById(feature).value = data[feature];
+                });
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
